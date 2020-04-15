@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 
+	"github.com/DeKal/bookstore_users-api/utils/dates"
 	"github.com/DeKal/bookstore_users-api/utils/errors"
 )
 
@@ -20,6 +21,8 @@ func (user *User) Save() *errors.RestError {
 		}
 		return errors.NewBadRequestError(errorMsg)
 	}
+
+	user.DateCreated = dates.GetNowString()
 	userDB[user.ID] = user
 	return nil
 }
