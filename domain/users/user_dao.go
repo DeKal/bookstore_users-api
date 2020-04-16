@@ -2,9 +2,16 @@ package users
 
 import (
 	"fmt"
+	"strings"
 
+	usersdb "github.com/DeKal/bookstore_users-api/datasources/mysql/users_db"
 	"github.com/DeKal/bookstore_users-api/utils/dates"
 	"github.com/DeKal/bookstore_users-api/utils/errors"
+)
+
+const (
+	indexUniqueEmail = "email_UNIQUE"
+	queryInsertUser  = "INSERT INTO users(first_name, last_name, email, date_created) VALUES (?,?,?,?);"
 )
 
 var (
@@ -13,17 +20,28 @@ var (
 
 // Save to persist User to DB
 func (user *User) Save() *errors.RestError {
-	findUser := userDB[user.ID]
-	if findUser != nil {
-		errorMsg := fmt.Sprintf("User %d has already registered", user.ID)
-		if findUser.Email == user.Email {
-			errorMsg = fmt.Sprintf("User email %s has already existed", user.Email)
-		}
-		return errors.NewBadRequestError(errorMsg)
+	stmt, err := usersdb.Client.Prepare(queryInsertUser)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
 	}
+	defer stmt.Close()
 
 	user.DateCreated = dates.GetNowString()
-	userDB[user.ID] = user
+	insertUser, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
+	if err != nil {
+		err := fmt.Sprintf("Error while trying to save user. %s", err.Error())
+		if strings.Contains(err, indexUniqueEmail) {
+			err = fmt.Sprintf("User email %s has already existed", user.Email)
+		}
+		return errors.NewInternalServerError(err)
+	}
+
+	userID, err := insertUser.LastInsertId()
+	if err != nil {
+		err := fmt.Sprintf("Error while trying to save user. %s", err.Error())
+		return errors.NewInternalServerError(err)
+	}
+	user.ID = userID
 	return nil
 }
 
