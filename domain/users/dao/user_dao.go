@@ -12,6 +12,7 @@ const (
 	queryInsertUser = "INSERT INTO users(first_name, last_name, email, date_created) VALUES (?,?,?,?);"
 	queryGetUser    = "SELECT id, first_name, last_name, email, date_created FROM users where id=?;"
 	queryUpdate     = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
+	queryDelete     = "DELETE FROM users WHERE id=?;"
 )
 
 // Save to persist User to DB
@@ -66,6 +67,21 @@ func Update(user *userdto.User) *errors.RestError {
 
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
 	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
+
+	return nil
+}
+
+// Delete to delete existed User from DB
+func Delete(userID int64) *errors.RestError {
+	stmt, err := usersdb.Client.Prepare(queryDelete)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
+	defer stmt.Close()
+
+	if _, err = stmt.Exec(userID); err != nil {
 		return errors.NewInternalServerError(err.Error())
 	}
 

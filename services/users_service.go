@@ -80,3 +80,16 @@ func PatchUser(user userdto.User) (*userdto.User, *errors.RestError) {
 
 	return existedUser, nil
 }
+
+func DeleteUser(userID int64) *errors.RestError {
+	if userID <= 0 {
+		return errors.NewBadRequestError("Invalid user id")
+	}
+
+	err := userdao.Delete(userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

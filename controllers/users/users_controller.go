@@ -2,7 +2,6 @@ package users
 
 import (
 	"net/http"
-	"strconv"
 
 	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/services"
@@ -10,27 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func parseUserID(context *gin.Context) (int64, *errors.RestError) {
-	userID, err := strconv.ParseInt(context.Param("user_id"), 10, 64)
-	if err != nil {
-		parsedError := errors.NewBadRequestError("User id must be a number")
-		return -1, parsedError
-	}
-	return userID, nil
-}
-
-func parseUser(context *gin.Context) (*userdto.User, *errors.RestError) {
-	user := &userdto.User{}
-	err := context.ShouldBindJSON(&user)
-	if err != nil {
-		restError := errors.NewBadRequestError("Invalid json body")
-		return nil, restError
-	}
-	return user, nil
-}
-
-// GetUser getting users from bookstore
-func GetUser(context *gin.Context) {
+// Get getting users from bookstore
+func Get(context *gin.Context) {
 	userID, err := parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
@@ -45,8 +25,8 @@ func GetUser(context *gin.Context) {
 	context.JSON(http.StatusCreated, target)
 }
 
-// CreateUser creating user for bookstore
-func CreateUser(context *gin.Context) {
+// Create creating user for bookstore
+func Create(context *gin.Context) {
 	user := userdto.User{}
 	err := context.ShouldBindJSON(&user)
 	if err != nil {
@@ -63,8 +43,8 @@ func CreateUser(context *gin.Context) {
 	context.JSON(http.StatusCreated, target)
 }
 
-// UpdateUser updating user for bookstore
-func UpdateUser(context *gin.Context) {
+// Update updating user for bookstore
+func Update(context *gin.Context) {
 	userID, err := parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
@@ -84,11 +64,11 @@ func UpdateUser(context *gin.Context) {
 		context.JSON(updateErr.Status, updateErr)
 		return
 	}
-	context.JSON(http.StatusCreated, target)
+	context.JSON(http.StatusOK, target)
 }
 
-// PatchUser updating user for bookstore
-func PatchUser(context *gin.Context) {
+// Patch updating user for bookstore
+func Patch(context *gin.Context) {
 	userID, err := parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
@@ -108,5 +88,21 @@ func PatchUser(context *gin.Context) {
 		context.JSON(updateErr.Status, updateErr)
 		return
 	}
-	context.JSON(http.StatusCreated, target)
+	context.JSON(http.StatusOK, target)
+}
+
+// Delete updating user for bookstore
+func Delete(context *gin.Context) {
+	userID, err := parseUserID(context)
+	if err != nil {
+		context.JSON(err.Status, err)
+		return
+	}
+
+	deleteErr := services.DeleteUser(userID)
+	if deleteErr != nil {
+		context.JSON(deleteErr.Status, deleteErr)
+		return
+	}
+	context.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
