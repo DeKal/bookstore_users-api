@@ -5,6 +5,7 @@ import (
 
 	usersdb "github.com/DeKal/bookstore_users-api/datasources/mysql/users_db"
 	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/logger"
 	"github.com/DeKal/bookstore_users-api/utils/errors"
 	mysqlutils "github.com/DeKal/bookstore_users-api/utils/mysql_utils"
 )
@@ -58,7 +59,8 @@ func (*userDAO) Save(user *userdto.User) *errors.RestError {
 func (*userDAO) Get(user *userdto.User) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryGetUser)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		logger.Error("Error while prepare SQL statement for get user", err)
+		return errors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
@@ -77,13 +79,15 @@ func (*userDAO) Get(user *userdto.User) *errors.RestError {
 func (*userDAO) Update(user *userdto.User) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryUpdate)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		logger.Error("Error while prepare SQL statement for update user", err)
+		return errors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		logger.Error("Error while execute SQL update statement", err)
+		return errors.NewInternalServerError("Database error")
 	}
 
 	return nil
@@ -93,12 +97,14 @@ func (*userDAO) Update(user *userdto.User) *errors.RestError {
 func (*userDAO) Delete(userID int64) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryDelete)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		logger.Error("Error while prepare SQL statement for delete user", err)
+		return errors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	if _, err = stmt.Exec(userID); err != nil {
-		return errors.NewInternalServerError(err.Error())
+		logger.Error("Error while execute SQL delete statement", err)
+		return errors.NewInternalServerError("Database error")
 	}
 
 	return nil
@@ -108,13 +114,15 @@ func (*userDAO) Delete(userID int64) *errors.RestError {
 func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
 	stmt, err := usersdb.Client.Prepare(queryFindUserByStatus)
 	if err != nil {
-		return nil, errors.NewInternalServerError(err.Error())
+		logger.Error("Error while prepare SQL statement for find user by status", err)
+		return nil, errors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(status)
 	if err != nil {
-		return nil, errors.NewInternalServerError(err.Error())
+		logger.Error("Error while execute SQL queryFindUserByStatus statement", err)
+		return nil, errors.NewInternalServerError("Database error")
 	}
 	defer rows.Close()
 
@@ -124,7 +132,8 @@ func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status)
 		if err != nil {
-			return nil, errors.NewInternalServerError(err.Error())
+			logger.Error("Error while execute SQL queryFindUserByStatus statement", err)
+			return nil, errors.NewInternalServerError("Database error")
 		}
 		users = append(users, user)
 	}
