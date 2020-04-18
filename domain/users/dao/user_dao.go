@@ -91,7 +91,7 @@ func Delete(userID int64) *errors.RestError {
 }
 
 // FindByStatus find Users by status
-func FindByStatus(status string) ([]userdto.User, *errors.RestError) {
+func FindByStatus(status string) (userdto.Users, *errors.RestError) {
 	stmt, err := usersdb.Client.Prepare(queryFindUserByStatus)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())
@@ -104,7 +104,7 @@ func FindByStatus(status string) ([]userdto.User, *errors.RestError) {
 	}
 	defer rows.Close()
 
-	users := make([]userdto.User, 0)
+	users := make(userdto.Users, 0)
 	for rows.Next() {
 		user := userdto.User{}
 		err := rows.Scan(

@@ -5,7 +5,7 @@ import (
 
 	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/services"
-	"github.com/DeKal/bookstore_users-api/utils/errors"
+	ginutils "github.com/DeKal/bookstore_users-api/utils/gin_utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,25 +22,25 @@ func Get(context *gin.Context) {
 		context.JSON(getErr.Status, getErr)
 		return
 	}
-	context.JSON(http.StatusCreated, target)
+	isPublic := ginutils.IsPublicHeader(context)
+	context.JSON(http.StatusOK, target.Marshall(isPublic))
 }
 
 // Create creating user for bookstore
 func Create(context *gin.Context) {
-	user := userdto.User{}
-	err := context.ShouldBindJSON(&user)
+	user, err := parseUser(context)
 	if err != nil {
-		restError := errors.NewBadRequestError("Invalid json body")
-		context.JSON(restError.Status, restError)
+		context.JSON(err.Status, err)
 		return
 	}
 
-	target, createErr := services.CreateUser(user)
+	target, createErr := services.CreateUser(*user)
 	if createErr != nil {
 		context.JSON(createErr.Status, createErr)
 		return
 	}
-	context.JSON(http.StatusCreated, target)
+	isPublic := ginutils.IsPublicHeader(context)
+	context.JSON(http.StatusCreated, target.Marshall(isPublic))
 }
 
 // Update updating user for bookstore
@@ -64,7 +64,8 @@ func Update(context *gin.Context) {
 		context.JSON(updateErr.Status, updateErr)
 		return
 	}
-	context.JSON(http.StatusOK, target)
+	isPublic := ginutils.IsPublicHeader(context)
+	context.JSON(http.StatusOK, target.Marshall(isPublic))
 }
 
 // Patch updating user for bookstore
@@ -88,7 +89,8 @@ func Patch(context *gin.Context) {
 		context.JSON(updateErr.Status, updateErr)
 		return
 	}
-	context.JSON(http.StatusOK, target)
+	isPublic := ginutils.IsPublicHeader(context)
+	context.JSON(http.StatusOK, target.Marshall(isPublic))
 }
 
 // Delete updating user for bookstore
@@ -116,6 +118,6 @@ func Search(context *gin.Context) {
 		context.JSON(err.Status, err)
 		return
 	}
-
-	context.JSON(http.StatusOK, users)
+	isPublic := ginutils.IsPublicHeader(context)
+	context.JSON(http.StatusOK, users.Marshall(isPublic))
 }

@@ -3,6 +3,7 @@ package services
 import (
 	userdao "github.com/DeKal/bookstore_users-api/domain/users/dao"
 	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/utils/crypto"
 	"github.com/DeKal/bookstore_users-api/utils/dates"
 	"github.com/DeKal/bookstore_users-api/utils/errors"
 )
@@ -15,6 +16,7 @@ func CreateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 	}
 	user.Status = userdto.StatusActive
 	user.DateCreated = dates.GetNowDBString()
+	user.Password = crypto.GetMD5(user.Password)
 
 	err = userdao.Save(&user)
 	if err != nil {
@@ -99,7 +101,7 @@ func DeleteUser(userID int64) *errors.RestError {
 }
 
 // Search to search users having given status
-func Search(status string) ([]userdto.User, *errors.RestError) {
+func Search(status string) (userdto.Users, *errors.RestError) {
 	if status == "" {
 		return nil, errors.NewBadRequestError("Invalid status")
 	}
