@@ -106,3 +106,16 @@ func Delete(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
+
+// Search search for users for a given condition query
+func Search(context *gin.Context) {
+	status := context.Query("status")
+
+	users, err := services.Search(status)
+	if err != nil {
+		context.JSON(err.Status, err)
+		return
+	}
+
+	context.JSON(http.StatusOK, users)
+}

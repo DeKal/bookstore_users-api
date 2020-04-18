@@ -3,6 +3,7 @@ package services
 import (
 	userdao "github.com/DeKal/bookstore_users-api/domain/users/dao"
 	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/utils/dates"
 	"github.com/DeKal/bookstore_users-api/utils/errors"
 )
 
@@ -12,6 +13,8 @@ func CreateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 	if err != nil {
 		return nil, err
 	}
+	user.Status = userdto.StatusActive
+	user.DateCreated = dates.GetNowDBString()
 
 	err = userdao.Save(&user)
 	if err != nil {
@@ -81,6 +84,7 @@ func PatchUser(user userdto.User) (*userdto.User, *errors.RestError) {
 	return existedUser, nil
 }
 
+// DeleteUser to Delete a user with given userId
 func DeleteUser(userID int64) *errors.RestError {
 	if userID <= 0 {
 		return errors.NewBadRequestError("Invalid user id")
@@ -92,4 +96,17 @@ func DeleteUser(userID int64) *errors.RestError {
 	}
 
 	return nil
+}
+
+// Search to search users having given status
+func Search(status string) ([]userdto.User, *errors.RestError) {
+	if status == "" {
+		return nil, errors.NewBadRequestError("Invalid status")
+	}
+	users, err := userdao.FindByStatus(status)
+	if err != nil {
+		return nil, errors.NewInternalServerError(err.Error)
+	}
+
+	return users, nil
 }
