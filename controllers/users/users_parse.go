@@ -8,7 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func parseUserID(context *gin.Context) (int64, *errors.RestError) {
+var (
+	userParser usersDTOParserInterface = &usersDTOParser{}
+)
+
+type usersDTOParserInterface interface {
+	parseUserID(context *gin.Context) (int64, *errors.RestError)
+	parseUser(context *gin.Context) (*userdto.User, *errors.RestError)
+}
+type usersDTOParser struct{}
+
+func (*usersDTOParser) parseUserID(context *gin.Context) (int64, *errors.RestError) {
 	userID, err := strconv.ParseInt(context.Param("user_id"), 10, 64)
 	if err != nil {
 		parsedError := errors.NewBadRequestError("User id must be a number")
@@ -17,7 +27,7 @@ func parseUserID(context *gin.Context) (int64, *errors.RestError) {
 	return userID, nil
 }
 
-func parseUser(context *gin.Context) (*userdto.User, *errors.RestError) {
+func (*usersDTOParser) parseUser(context *gin.Context) (*userdto.User, *errors.RestError) {
 	user := &userdto.User{}
 	err := context.ShouldBindJSON(&user)
 	if err != nil {

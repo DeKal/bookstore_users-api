@@ -17,8 +17,22 @@ const (
 	queryFindUserByStatus = "SELECT id, first_name, last_name, email, date_created, status FROM users WHERE status=?;"
 )
 
+var (
+	// UserDAO contains logic working directly with DB
+	UserDAO userDAOInterface = &userDAO{}
+)
+
+type userDAO struct{}
+type userDAOInterface interface {
+	Save(*userdto.User) *errors.RestError
+	Get(*userdto.User) *errors.RestError
+	Update(*userdto.User) *errors.RestError
+	Delete(int64) *errors.RestError
+	FindByStatus(string) (userdto.Users, *errors.RestError)
+}
+
 // Save to persist User to DB
-func Save(user *userdto.User) *errors.RestError {
+func (*userDAO) Save(user *userdto.User) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryInsertUser)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
@@ -41,7 +55,7 @@ func Save(user *userdto.User) *errors.RestError {
 }
 
 // Get to get User from DB
-func Get(user *userdto.User) *errors.RestError {
+func (*userDAO) Get(user *userdto.User) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryGetUser)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
@@ -60,7 +74,7 @@ func Get(user *userdto.User) *errors.RestError {
 }
 
 // Update to update existed User from DB
-func Update(user *userdto.User) *errors.RestError {
+func (*userDAO) Update(user *userdto.User) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryUpdate)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
@@ -76,7 +90,7 @@ func Update(user *userdto.User) *errors.RestError {
 }
 
 // Delete to delete existed User from DB
-func Delete(userID int64) *errors.RestError {
+func (*userDAO) Delete(userID int64) *errors.RestError {
 	stmt, err := usersdb.Client.Prepare(queryDelete)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
@@ -91,7 +105,7 @@ func Delete(userID int64) *errors.RestError {
 }
 
 // FindByStatus find Users by status
-func FindByStatus(status string) (userdto.Users, *errors.RestError) {
+func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
 	stmt, err := usersdb.Client.Prepare(queryFindUserByStatus)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error())

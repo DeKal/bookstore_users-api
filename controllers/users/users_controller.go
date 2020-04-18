@@ -9,15 +9,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	// UsersController for calling service to matching URL
+	UsersController usersControllerInterface = &usersController{}
+	usersService                             = services.UsersService
+)
+
+type usersController struct{}
+type usersControllerInterface interface {
+	Get(*gin.Context)
+	Create(*gin.Context)
+	Update(*gin.Context)
+	Patch(*gin.Context)
+	Delete(*gin.Context)
+	Search(*gin.Context)
+}
+
 // Get getting users from bookstore
-func Get(context *gin.Context) {
-	userID, err := parseUserID(context)
+func (*usersController) Get(context *gin.Context) {
+	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	target, getErr := services.GetUser(userID)
+	target, getErr := usersService.GetUser(userID)
 	if getErr != nil {
 		context.JSON(getErr.Status, getErr)
 		return
@@ -27,14 +43,14 @@ func Get(context *gin.Context) {
 }
 
 // Create creating user for bookstore
-func Create(context *gin.Context) {
-	user, err := parseUser(context)
+func (*usersController) Create(context *gin.Context) {
+	user, err := userParser.parseUser(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	target, createErr := services.CreateUser(*user)
+	target, createErr := usersService.CreateUser(*user)
 	if createErr != nil {
 		context.JSON(createErr.Status, createErr)
 		return
@@ -44,22 +60,22 @@ func Create(context *gin.Context) {
 }
 
 // Update updating user for bookstore
-func Update(context *gin.Context) {
-	userID, err := parseUserID(context)
+func (*usersController) Update(context *gin.Context) {
+	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
 	var user *userdto.User
-	user, err = parseUser(context)
+	user, err = userParser.parseUser(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 	user.ID = userID
 
-	target, updateErr := services.UpdateUser(*user)
+	target, updateErr := usersService.UpdateUser(*user)
 	if updateErr != nil {
 		context.JSON(updateErr.Status, updateErr)
 		return
@@ -69,22 +85,22 @@ func Update(context *gin.Context) {
 }
 
 // Patch updating user for bookstore
-func Patch(context *gin.Context) {
-	userID, err := parseUserID(context)
+func (*usersController) Patch(context *gin.Context) {
+	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
 	var user *userdto.User
-	user, err = parseUser(context)
+	user, err = userParser.parseUser(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 	user.ID = userID
 
-	target, updateErr := services.PatchUser(*user)
+	target, updateErr := usersService.PatchUser(*user)
 	if updateErr != nil {
 		context.JSON(updateErr.Status, updateErr)
 		return
@@ -94,14 +110,14 @@ func Patch(context *gin.Context) {
 }
 
 // Delete updating user for bookstore
-func Delete(context *gin.Context) {
-	userID, err := parseUserID(context)
+func (*usersController) Delete(context *gin.Context) {
+	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	deleteErr := services.DeleteUser(userID)
+	deleteErr := usersService.DeleteUser(userID)
 	if deleteErr != nil {
 		context.JSON(deleteErr.Status, deleteErr)
 		return
@@ -110,10 +126,10 @@ func Delete(context *gin.Context) {
 }
 
 // Search search for users for a given condition query
-func Search(context *gin.Context) {
+func (*usersController) Search(context *gin.Context) {
 	status := context.Query("status")
 
-	users, err := services.Search(status)
+	users, err := usersService.Search(status)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return

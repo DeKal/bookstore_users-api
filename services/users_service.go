@@ -8,8 +8,25 @@ import (
 	"github.com/DeKal/bookstore_users-api/utils/errors"
 )
 
+var (
+	// UsersService is service for Users
+	UsersService usersServiceInterface = &usersService{}
+	userDAO                            = userdao.UserDAO
+)
+
+type usersService struct{}
+
+type usersServiceInterface interface {
+	CreateUser(userdto.User) (*userdto.User, *errors.RestError)
+	GetUser(int64) (*userdto.User, *errors.RestError)
+	UpdateUser(userdto.User) (*userdto.User, *errors.RestError)
+	PatchUser(userdto.User) (*userdto.User, *errors.RestError)
+	DeleteUser(int64) *errors.RestError
+	Search(string) (userdto.Users, *errors.RestError)
+}
+
 // CreateUser create a user in DB
-func CreateUser(user userdto.User) (*userdto.User, *errors.RestError) {
+func (*usersService) CreateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 	err := user.Validate()
 	if err != nil {
 		return nil, err
@@ -18,7 +35,7 @@ func CreateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 	user.DateCreated = dates.GetNowDBString()
 	user.Password = crypto.GetMD5(user.Password)
 
-	err = userdao.Save(&user)
+	err = userDAO.Save(&user)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +44,7 @@ func CreateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 }
 
 // GetUser get a user in DB
-func GetUser(userID int64) (*userdto.User, *errors.RestError) {
+func (*usersService) GetUser(userID int64) (*userdto.User, *errors.RestError) {
 	if userID <= 0 {
 		return nil, errors.NewBadRequestError("Invalid user id")
 	}
@@ -35,7 +52,7 @@ func GetUser(userID int64) (*userdto.User, *errors.RestError) {
 	target := &userdto.User{
 		ID: userID,
 	}
-	err := userdao.Get(target)
+	err := userDAO.Get(target)
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +61,8 @@ func GetUser(userID int64) (*userdto.User, *errors.RestError) {
 }
 
 // UpdateUser update a user in DB
-func UpdateUser(user userdto.User) (*userdto.User, *errors.RestError) {
-	existedUser, err := GetUser(user.ID)
+func (*usersService) UpdateUser(user userdto.User) (*userdto.User, *errors.RestError) {
+	existedUser, err := UsersService.GetUser(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +70,7 @@ func UpdateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 	existedUser.LastName = user.LastName
 	existedUser.Email = user.Email
 
-	err = userdao.Update(existedUser)
+	err = userDAO.Update(existedUser)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +79,8 @@ func UpdateUser(user userdto.User) (*userdto.User, *errors.RestError) {
 }
 
 // PatchUser update a user in DB
-func PatchUser(user userdto.User) (*userdto.User, *errors.RestError) {
-	existedUser, err := GetUser(user.ID)
+func (*usersService) PatchUser(user userdto.User) (*userdto.User, *errors.RestError) {
+	existedUser, err := UsersService.GetUser(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +95,7 @@ func PatchUser(user userdto.User) (*userdto.User, *errors.RestError) {
 		existedUser.Email = user.Email
 	}
 
-	err = userdao.Update(existedUser)
+	err = userDAO.Update(existedUser)
 	if err != nil {
 		return nil, err
 	}
@@ -87,12 +104,12 @@ func PatchUser(user userdto.User) (*userdto.User, *errors.RestError) {
 }
 
 // DeleteUser to Delete a user with given userId
-func DeleteUser(userID int64) *errors.RestError {
+func (*usersService) DeleteUser(userID int64) *errors.RestError {
 	if userID <= 0 {
 		return errors.NewBadRequestError("Invalid user id")
 	}
 
-	err := userdao.Delete(userID)
+	err := userDAO.Delete(userID)
 	if err != nil {
 		return err
 	}
@@ -101,11 +118,11 @@ func DeleteUser(userID int64) *errors.RestError {
 }
 
 // Search to search users having given status
-func Search(status string) (userdto.Users, *errors.RestError) {
+func (*usersService) Search(status string) (userdto.Users, *errors.RestError) {
 	if status == "" {
 		return nil, errors.NewBadRequestError("Invalid status")
 	}
-	users, err := userdao.FindByStatus(status)
+	users, err := userDAO.FindByStatus(status)
 	if err != nil {
 		return nil, errors.NewInternalServerError(err.Error)
 	}
