@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
-	"github.com/DeKal/bookstore_users-api/src/utils/errors"
+	"github.com/DeKal/bookstore_utils-go/errors"
 	"github.com/gin-gonic/gin"
 )
 

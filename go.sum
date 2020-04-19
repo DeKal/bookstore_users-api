@@ -2,6 +2,10 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/DeKal/bookstore_oauth-go v0.0.0-20200419122327-eb4320b09a7d h1:Ssr4WNxC/5bOTaCgwfdJsYF5dt8THto+okmypDPl19o=
 github.com/DeKal/bookstore_oauth-go v0.0.0-20200419122327-eb4320b09a7d/go.mod h1:hQOW+r6y/jxRzBPMvwjt105FfBeNO0hSHj5Og6lYHws=
+github.com/DeKal/bookstore_oauth-go v0.0.0-20200419160345-78a06b1eeb6c h1:6haowW3FKb8mN4W9orVhlUfMqKwvKw/+OQQYFKOtBHc=
+github.com/DeKal/bookstore_oauth-go v0.0.0-20200419160345-78a06b1eeb6c/go.mod h1:ZkDBKr0H4PUcupa2ZtIZmT98uDx9oBczfGB+VZZGkeo=
+github.com/DeKal/bookstore_utils-go v0.0.0-20200419142414-99adc7088cc5 h1:iZZ6KNa1LtsZcQB+cPCMBixBPJKMMPZY7Nfy+PMMMac=
+github.com/DeKal/bookstore_utils-go v0.0.0-20200419142414-99adc7088cc5/go.mod h1:qi/d2BQ2slbT1pak1vmWO1ZClCYGKDM0Vu+w7lvqxpk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

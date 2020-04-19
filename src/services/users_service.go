@@ -3,9 +3,9 @@ package services
 import (
 	userdao "github.com/DeKal/bookstore_users-api/src/domain/users/dao"
 	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
-	"github.com/DeKal/bookstore_users-api/src/utils/crypto"
-	"github.com/DeKal/bookstore_users-api/src/utils/dates"
-	"github.com/DeKal/bookstore_users-api/src/utils/errors"
+	"github.com/DeKal/bookstore_utils-go/crypto"
+	"github.com/DeKal/bookstore_utils-go/dates"
+	"github.com/DeKal/bookstore_utils-go/errors"
 )
 
 var (

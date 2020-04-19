@@ -6,7 +6,7 @@ import (
 	"github.com/DeKal/bookstore_oauth-go/oauth"
 	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/services"
-	"github.com/DeKal/bookstore_users-api/src/utils/errors"
+	"github.com/DeKal/bookstore_utils-go/errors"
 	"github.com/gin-gonic/gin"
 )
 

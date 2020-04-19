@@ -6,7 +6,7 @@ import (
 
 	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/logger"
-	"github.com/DeKal/bookstore_users-api/src/utils/errors"
+	"github.com/DeKal/bookstore_utils-go/errors"
 	"github.com/go-sql-driver/mysql"
 )
 

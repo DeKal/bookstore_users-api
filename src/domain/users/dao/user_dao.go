@@ -6,8 +6,8 @@ import (
 	usersdb "github.com/DeKal/bookstore_users-api/src/datasources/mysql/users_db"
 	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/logger"
-	"github.com/DeKal/bookstore_users-api/src/utils/errors"
 	mysqlutils "github.com/DeKal/bookstore_users-api/src/utils/mysql_utils"
+	"github.com/DeKal/bookstore_utils-go/errors"
 )
 
 const (
