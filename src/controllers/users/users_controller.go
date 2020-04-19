@@ -3,10 +3,10 @@ package users
 import (
 	"net/http"
 
+	"github.com/DeKal/bookstore_oauth-go/oauth"
 	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/services"
 	"github.com/DeKal/bookstore_users-api/src/utils/errors"
-	ginutils "github.com/DeKal/bookstore_users-api/src/utils/gin_utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,6 +29,11 @@ type usersControllerInterface interface {
 
 // Get getting users from bookstore
 func (*usersController) Get(context *gin.Context) {
+	if err := oauth.AuthenticateRequest(context.Request); err != nil {
+		context.JSON(err.Status, err)
+		return
+	}
+
 	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
@@ -40,7 +45,11 @@ func (*usersController) Get(context *gin.Context) {
 		context.JSON(getErr.Status, getErr)
 		return
 	}
-	isPublic := ginutils.IsPublicHeader(context)
+	if oauth.GetCallerID(context.Request) == target.ID {
+		context.JSON(http.StatusOK, target.MarshallPrivate())
+		return
+	}
+	isPublic := oauth.IsPublic(context.Request)
 	context.JSON(http.StatusOK, target.Marshall(isPublic))
 }
 
@@ -57,7 +66,7 @@ func (*usersController) Create(context *gin.Context) {
 		context.JSON(createErr.Status, createErr)
 		return
 	}
-	isPublic := ginutils.IsPublicHeader(context)
+	isPublic := oauth.IsPublic(context.Request)
 	context.JSON(http.StatusCreated, target.Marshall(isPublic))
 }
 
@@ -82,7 +91,7 @@ func (*usersController) Update(context *gin.Context) {
 		context.JSON(updateErr.Status, updateErr)
 		return
 	}
-	isPublic := ginutils.IsPublicHeader(context)
+	isPublic := oauth.IsPublic(context.Request)
 	context.JSON(http.StatusOK, target.Marshall(isPublic))
 }
 
@@ -107,7 +116,7 @@ func (*usersController) Patch(context *gin.Context) {
 		context.JSON(updateErr.Status, updateErr)
 		return
 	}
-	isPublic := ginutils.IsPublicHeader(context)
+	isPublic := oauth.IsPublic(context.Request)
 	context.JSON(http.StatusOK, target.Marshall(isPublic))
 }
 
@@ -136,7 +145,7 @@ func (*usersController) Search(context *gin.Context) {
 		context.JSON(err.Status, err)
 		return
 	}
-	isPublic := ginutils.IsPublicHeader(context)
+	isPublic := oauth.IsPublic(context.Request)
 	context.JSON(http.StatusOK, users.Marshall(isPublic))
 }
 
@@ -153,6 +162,6 @@ func (*usersController) Login(context *gin.Context) {
 		context.JSON(err.Status, err)
 		return
 	}
-	isPublic := ginutils.IsPublicHeader(context)
+	isPublic := oauth.IsPublic(context.Request)
 	context.JSON(http.StatusOK, user.Marshall(isPublic))
 }
