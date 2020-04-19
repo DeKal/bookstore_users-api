@@ -3,7 +3,7 @@ package userdto
 import (
 	"strings"
 
-	"github.com/DeKal/bookstore_users-api/utils/errors"
+	"github.com/DeKal/bookstore_users-api/src/utils/errors"
 )
 
 const (

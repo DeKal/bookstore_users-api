@@ -1,11 +1,11 @@
 package services
 
 import (
-	userdao "github.com/DeKal/bookstore_users-api/domain/users/dao"
-	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
-	"github.com/DeKal/bookstore_users-api/utils/crypto"
-	"github.com/DeKal/bookstore_users-api/utils/dates"
-	"github.com/DeKal/bookstore_users-api/utils/errors"
+	userdao "github.com/DeKal/bookstore_users-api/src/domain/users/dao"
+	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/utils/crypto"
+	"github.com/DeKal/bookstore_users-api/src/utils/dates"
+	"github.com/DeKal/bookstore_users-api/src/utils/errors"
 )
 
 var (

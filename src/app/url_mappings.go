@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/DeKal/bookstore_users-api/controllers/ping"
-	"github.com/DeKal/bookstore_users-api/controllers/users"
+	"github.com/DeKal/bookstore_users-api/src/controllers/ping"
+	"github.com/DeKal/bookstore_users-api/src/controllers/users"
 )
 
 var (

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/DeKal/bookstore_users-api/datasources/mysql/source"
+	"github.com/DeKal/bookstore_users-api/src/datasources/mysql/source"
 	// This includes a mysql driver
 	_ "github.com/go-sql-driver/mysql"
 )

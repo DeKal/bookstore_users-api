@@ -3,10 +3,10 @@ package users
 import (
 	"net/http"
 
-	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
-	"github.com/DeKal/bookstore_users-api/services"
-	"github.com/DeKal/bookstore_users-api/utils/errors"
-	ginutils "github.com/DeKal/bookstore_users-api/utils/gin_utils"
+	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/services"
+	"github.com/DeKal/bookstore_users-api/src/utils/errors"
+	ginutils "github.com/DeKal/bookstore_users-api/src/utils/gin_utils"
 	"github.com/gin-gonic/gin"
 )
 

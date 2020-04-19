@@ -3,8 +3,8 @@ package users
 import (
 	"strconv"
 
-	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
-	"github.com/DeKal/bookstore_users-api/utils/errors"
+	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/utils/errors"
 	"github.com/gin-gonic/gin"
 )
 
