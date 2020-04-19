@@ -5,6 +5,7 @@ import (
 
 	userdto "github.com/DeKal/bookstore_users-api/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/services"
+	"github.com/DeKal/bookstore_users-api/utils/errors"
 	ginutils "github.com/DeKal/bookstore_users-api/utils/gin_utils"
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +24,7 @@ type usersControllerInterface interface {
 	Patch(*gin.Context)
 	Delete(*gin.Context)
 	Search(*gin.Context)
+	Login(*gin.Context)
 }
 
 // Get getting users from bookstore
@@ -136,4 +138,21 @@ func (*usersController) Search(context *gin.Context) {
 	}
 	isPublic := ginutils.IsPublicHeader(context)
 	context.JSON(http.StatusOK, users.Marshall(isPublic))
+}
+
+func (*usersController) Login(context *gin.Context) {
+	request := userdto.LoginRequest{}
+	if err := context.ShouldBindJSON(&request); err != nil {
+		restError := errors.NewBadRequestError("Invalid json body")
+		context.JSON(restError.Status, restError)
+		return
+	}
+
+	user, err := usersService.Login(request)
+	if err != nil {
+		context.JSON(err.Status, err)
+		return
+	}
+	isPublic := ginutils.IsPublicHeader(context)
+	context.JSON(http.StatusOK, user.Marshall(isPublic))
 }

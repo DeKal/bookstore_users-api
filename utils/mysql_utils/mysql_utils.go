@@ -11,12 +11,14 @@ import (
 )
 
 const (
-	duplicatedKey         = 1062
-	errorSaveUser         = "Error while trying to save user. %s"
-	errorUserEmailExisted = "User email %s has already existed"
-	errorGetUser          = "Error while trying to get user %d. %s"
-	errorUserNotExisted   = "User %d does not exist"
-	errNoRow              = "no rows in result set"
+	duplicatedKey                = 1062
+	errorSaveUser                = "Error while trying to save user. %s"
+	errorUserEmailExisted        = "User email %s has already existed"
+	errorGetUser                 = "Error while trying to get user %d. %s"
+	errorUserNotExisted          = "User %d does not exist"
+	errorLoginUser               = "Something wrong when login in the user %d. %s"
+	errorUserNotHavingCredential = "User %d does not have valid credential"
+	errNoRow                     = "no rows in result set"
 )
 
 // HandleSaveUserError handle error when saving a user
@@ -48,6 +50,16 @@ func HandleGetUserError(user *userdto.User, err error) *errors.RestError {
 	errMsg := fmt.Sprintf(errorGetUser, user.ID, err.Error())
 	if strings.Contains(errMsg, errNoRow) {
 		errMsg = fmt.Sprintf(errorUserNotExisted, user.ID)
+	}
+	logger.Error(errMsg, nil)
+	return errors.NewInternalServerError(errMsg)
+}
+
+// HandleLoginUserError handle error when login a user
+func HandleLoginUserError(user *userdto.User, err error) *errors.RestError {
+	errMsg := fmt.Sprintf(errorLoginUser, user.ID, err.Error())
+	if strings.Contains(errMsg, errNoRow) {
+		errMsg = fmt.Sprintf(errorUserNotHavingCredential, user.ID)
 	}
 	logger.Error(errMsg, nil)
 	return errors.NewInternalServerError(errMsg)

@@ -23,6 +23,7 @@ type usersServiceInterface interface {
 	PatchUser(userdto.User) (*userdto.User, *errors.RestError)
 	DeleteUser(int64) *errors.RestError
 	Search(string) (userdto.Users, *errors.RestError)
+	Login(userdto.LoginRequest) (*userdto.User, *errors.RestError)
 }
 
 // CreateUser create a user in DB
@@ -128,4 +129,16 @@ func (*usersService) Search(status string) (userdto.Users, *errors.RestError) {
 	}
 
 	return users, nil
+}
+
+// Login to login user in the system
+func (*usersService) Login(request userdto.LoginRequest) (*userdto.User, *errors.RestError) {
+	user := &userdto.User{
+		Email:    request.Email,
+		Password: crypto.GetMD5(request.Password),
+	}
+	if err := userDAO.FindByEmailAndPassword(user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }

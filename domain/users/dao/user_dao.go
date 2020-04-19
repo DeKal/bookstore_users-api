@@ -16,6 +16,7 @@ const (
 	queryUpdate           = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
 	queryDelete           = "DELETE FROM users WHERE id=?;"
 	queryFindUserByStatus = "SELECT id, first_name, last_name, email, date_created, status FROM users WHERE status=?;"
+	queryFindByEmailPwd   = "SELECT id, first_name, last_name, email, date_created, status FROM users WHERE email=? AND password=? AND status=?;"
 )
 
 var (
@@ -30,6 +31,7 @@ type userDAOInterface interface {
 	Update(*userdto.User) *errors.RestError
 	Delete(int64) *errors.RestError
 	FindByStatus(string) (userdto.Users, *errors.RestError)
+	FindByEmailAndPassword(*userdto.User) *errors.RestError
 }
 
 // Save to persist User to DB
@@ -143,4 +145,25 @@ func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
 	}
 
 	return users, nil
+}
+
+// FindByEmailAndPassword to get User from DB
+func (*userDAO) FindByEmailAndPassword(user *userdto.User) *errors.RestError {
+	stmt, err := usersdb.Client.Prepare(queryFindByEmailPwd)
+	if err != nil {
+		logger.Error("Error while prepare SQL statement for get user by email and password", err)
+		return errors.NewInternalServerError("Database error")
+	}
+	defer stmt.Close()
+
+	result := stmt.QueryRow(user.Email, user.Password, userdto.StatusActive)
+	err = result.Scan(
+		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status)
+
+	if err != nil {
+		logger.Error("Error for get user by email and password", err)
+		return mysqlutils.HandleLoginUserError(user, err)
+	}
+
+	return nil
 }
