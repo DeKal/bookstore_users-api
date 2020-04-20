@@ -4,6 +4,8 @@ github.com/DeKal/bookstore_oauth-go v0.0.0-20200419122327-eb4320b09a7d h1:Ssr4WN
 github.com/DeKal/bookstore_oauth-go v0.0.0-20200419122327-eb4320b09a7d/go.mod h1:hQOW+r6y/jxRzBPMvwjt105FfBeNO0hSHj5Og6lYHws=
 github.com/DeKal/bookstore_oauth-go v0.0.0-20200419160345-78a06b1eeb6c h1:6haowW3FKb8mN4W9orVhlUfMqKwvKw/+OQQYFKOtBHc=
 github.com/DeKal/bookstore_oauth-go v0.0.0-20200419160345-78a06b1eeb6c/go.mod h1:ZkDBKr0H4PUcupa2ZtIZmT98uDx9oBczfGB+VZZGkeo=
+github.com/DeKal/bookstore_oauth-go v1.0.0 h1:Cnm6/vqVaCQnWR9t5F+67p2i/MHFVled9fn2MX7IU3E=
+github.com/DeKal/bookstore_oauth-go v1.0.0/go.mod h1:ZkDBKr0H4PUcupa2ZtIZmT98uDx9oBczfGB+VZZGkeo=
 github.com/DeKal/bookstore_utils-go v0.0.0-20200419142414-99adc7088cc5 h1:iZZ6KNa1LtsZcQB+cPCMBixBPJKMMPZY7Nfy+PMMMac=
 github.com/DeKal/bookstore_utils-go v0.0.0-20200419142414-99adc7088cc5/go.mod h1:qi/d2BQ2slbT1pak1vmWO1ZClCYGKDM0Vu+w7lvqxpk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
