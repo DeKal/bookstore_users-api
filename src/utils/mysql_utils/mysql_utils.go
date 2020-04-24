@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/logger"
 	"github.com/DeKal/bookstore_utils-go/errors"
 	"github.com/go-sql-driver/mysql"
@@ -22,7 +22,7 @@ const (
 )
 
 // HandleSaveUserError handle error when saving a user
-func HandleSaveUserError(user *userdto.User, err error) *errors.RestError {
+func HandleSaveUserError(user *dto.User, err error) *errors.RestError {
 	saveError, convertErr := err.(*mysql.MySQLError)
 	if convertErr {
 		return returnInternalServerWhenSavingUser(err)
@@ -46,7 +46,7 @@ func returnEmailExistedWhenSavingUser(email string) *errors.RestError {
 }
 
 // HandleGetUserError handle error when getting a user
-func HandleGetUserError(user *userdto.User, err error) *errors.RestError {
+func HandleGetUserError(user *dto.User, err error) *errors.RestError {
 	errMsg := fmt.Sprintf(errorGetUser, user.ID, err.Error())
 	if strings.Contains(errMsg, errNoRow) {
 		errMsg = fmt.Sprintf(errorUserNotExisted, user.ID)
@@ -56,7 +56,7 @@ func HandleGetUserError(user *userdto.User, err error) *errors.RestError {
 }
 
 // HandleLoginUserError handle error when login a user
-func HandleLoginUserError(user *userdto.User, err error) *errors.RestError {
+func HandleLoginUserError(user *dto.User, err error) *errors.RestError {
 	errMsg := fmt.Sprintf(errorLoginUser, user.ID, err.Error())
 	if strings.Contains(errMsg, errNoRow) {
 		errMsg = fmt.Sprintf(errorUserNotHavingCredential, user.ID)

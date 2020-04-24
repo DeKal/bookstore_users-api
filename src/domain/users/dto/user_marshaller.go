@@ -1,4 +1,4 @@
-package userdto
+package dto
 
 // PublicUser contains basic information of Users
 type PublicUser struct {

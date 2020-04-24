@@ -3,7 +3,7 @@ package users
 import (
 	"strconv"
 
-	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_utils-go/errors"
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +14,7 @@ var (
 
 type usersDTOParserInterface interface {
 	parseUserID(context *gin.Context) (int64, *errors.RestError)
-	parseUser(context *gin.Context) (*userdto.User, *errors.RestError)
+	parseUser(context *gin.Context) (*dto.User, *errors.RestError)
 }
 type usersDTOParser struct{}
 
@@ -27,8 +27,8 @@ func (*usersDTOParser) parseUserID(context *gin.Context) (int64, *errors.RestErr
 	return userID, nil
 }
 
-func (*usersDTOParser) parseUser(context *gin.Context) (*userdto.User, *errors.RestError) {
-	user := &userdto.User{}
+func (*usersDTOParser) parseUser(context *gin.Context) (*dto.User, *errors.RestError) {
+	user := &dto.User{}
 	err := context.ShouldBindJSON(&user)
 	if err != nil {
 		restError := errors.NewBadRequestError("Invalid json body")

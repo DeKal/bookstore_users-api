@@ -11,13 +11,8 @@ import (
 
 var (
 	// Client is our db
-	Client *sql.DB
+	client *sql.DB
 )
-
-func init() {
-	Client = openConnection()
-	log.Println("Database successfully connected.")
-}
 
 func openConnection() *sql.DB {
 	db, err := sql.Open("mysql", source.GetDataSourceName())
@@ -28,4 +23,14 @@ func openConnection() *sql.DB {
 		panic(err)
 	}
 	return db
+}
+
+// GetNewClientConnection return new client connection
+func GetNewClientConnection() *sql.DB {
+	if client != nil {
+		client.Close()
+	}
+	client = openConnection()
+	log.Println("Database successfully connected.")
+	return client
 }

@@ -4,20 +4,19 @@ import (
 	"net/http"
 
 	"github.com/DeKal/bookstore_oauth-go/oauth"
-	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/services"
 	"github.com/DeKal/bookstore_utils-go/errors"
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	// UsersController for calling service to matching URL
-	UsersController usersControllerInterface = &usersController{}
-	usersService                             = services.UsersService
-)
+// Controller define handlers for endpoints
+type Controller struct {
+	service services.UsersServiceInterface
+}
 
-type usersController struct{}
-type usersControllerInterface interface {
+// ControllerInterface interface define handlers for endpoints
+type ControllerInterface interface {
 	Get(*gin.Context)
 	Create(*gin.Context)
 	Update(*gin.Context)
@@ -27,8 +26,15 @@ type usersControllerInterface interface {
 	Login(*gin.Context)
 }
 
+// NewController return new controller
+func NewController(service services.UsersServiceInterface) ControllerInterface {
+	return &Controller{
+		service: service,
+	}
+}
+
 // Get getting users from bookstore
-func (*usersController) Get(context *gin.Context) {
+func (c *Controller) Get(context *gin.Context) {
 	if err := oauth.AuthenticateRequest(context.Request); err != nil {
 		context.JSON(err.Status, err)
 		return
@@ -40,7 +46,7 @@ func (*usersController) Get(context *gin.Context) {
 		return
 	}
 
-	target, getErr := usersService.GetUser(userID)
+	target, getErr := c.service.GetUser(userID)
 	if getErr != nil {
 		context.JSON(getErr.Status, getErr)
 		return
@@ -54,14 +60,14 @@ func (*usersController) Get(context *gin.Context) {
 }
 
 // Create creating user for bookstore
-func (*usersController) Create(context *gin.Context) {
+func (c *Controller) Create(context *gin.Context) {
 	user, err := userParser.parseUser(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	target, createErr := usersService.CreateUser(*user)
+	target, createErr := c.service.CreateUser(*user)
 	if createErr != nil {
 		context.JSON(createErr.Status, createErr)
 		return
@@ -71,14 +77,14 @@ func (*usersController) Create(context *gin.Context) {
 }
 
 // Update updating user for bookstore
-func (*usersController) Update(context *gin.Context) {
+func (c *Controller) Update(context *gin.Context) {
 	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	var user *userdto.User
+	var user *dto.User
 	user, err = userParser.parseUser(context)
 	if err != nil {
 		context.JSON(err.Status, err)
@@ -86,7 +92,7 @@ func (*usersController) Update(context *gin.Context) {
 	}
 	user.ID = userID
 
-	target, updateErr := usersService.UpdateUser(*user)
+	target, updateErr := c.service.UpdateUser(*user)
 	if updateErr != nil {
 		context.JSON(updateErr.Status, updateErr)
 		return
@@ -96,14 +102,14 @@ func (*usersController) Update(context *gin.Context) {
 }
 
 // Patch updating user for bookstore
-func (*usersController) Patch(context *gin.Context) {
+func (c *Controller) Patch(context *gin.Context) {
 	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	var user *userdto.User
+	var user *dto.User
 	user, err = userParser.parseUser(context)
 	if err != nil {
 		context.JSON(err.Status, err)
@@ -111,7 +117,7 @@ func (*usersController) Patch(context *gin.Context) {
 	}
 	user.ID = userID
 
-	target, updateErr := usersService.PatchUser(*user)
+	target, updateErr := c.service.PatchUser(*user)
 	if updateErr != nil {
 		context.JSON(updateErr.Status, updateErr)
 		return
@@ -121,14 +127,14 @@ func (*usersController) Patch(context *gin.Context) {
 }
 
 // Delete updating user for bookstore
-func (*usersController) Delete(context *gin.Context) {
+func (c *Controller) Delete(context *gin.Context) {
 	userID, err := userParser.parseUserID(context)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
 	}
 
-	deleteErr := usersService.DeleteUser(userID)
+	deleteErr := c.service.DeleteUser(userID)
 	if deleteErr != nil {
 		context.JSON(deleteErr.Status, deleteErr)
 		return
@@ -137,10 +143,10 @@ func (*usersController) Delete(context *gin.Context) {
 }
 
 // Search search for users for a given condition query
-func (*usersController) Search(context *gin.Context) {
+func (c *Controller) Search(context *gin.Context) {
 	status := context.Query("status")
 
-	users, err := usersService.Search(status)
+	users, err := c.service.Search(status)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return
@@ -149,15 +155,16 @@ func (*usersController) Search(context *gin.Context) {
 	context.JSON(http.StatusOK, users.Marshall(isPublic))
 }
 
-func (*usersController) Login(context *gin.Context) {
-	request := userdto.LoginRequest{}
+// Login login with user info
+func (c *Controller) Login(context *gin.Context) {
+	request := dto.LoginRequest{}
 	if err := context.ShouldBindJSON(&request); err != nil {
 		restError := errors.NewBadRequestError("Invalid json body")
 		context.JSON(restError.Status, restError)
 		return
 	}
 
-	user, err := usersService.Login(request)
+	user, err := c.service.Login(request)
 	if err != nil {
 		context.JSON(err.Status, err)
 		return

@@ -1,16 +1,8 @@
 package app
 
-import (
-	"github.com/DeKal/bookstore_users-api/src/controllers/ping"
-	"github.com/DeKal/bookstore_users-api/src/controllers/users"
-)
+import "github.com/DeKal/bookstore_users-api/src/controllers/users"
 
-var (
-	usersController = users.UsersController
-)
-
-func mapUrls() {
-	router.GET("/ping", ping.Ping)
+func mapUrls(usersController users.ControllerInterface) {
 
 	router.POST("/users", usersController.Create)
 	router.GET("/users/:user_id", usersController.Get)

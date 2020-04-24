@@ -1,4 +1,4 @@
-package userdto
+package dto
 
 // LoginRequest for user
 type LoginRequest struct {

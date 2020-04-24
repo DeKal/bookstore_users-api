@@ -1,10 +1,10 @@
-package userdao
+package dao
 
 import (
+	"database/sql"
 	"fmt"
 
-	usersdb "github.com/DeKal/bookstore_users-api/src/datasources/mysql/users_db"
-	userdto "github.com/DeKal/bookstore_users-api/src/domain/users/dto"
+	"github.com/DeKal/bookstore_users-api/src/domain/users/dto"
 	"github.com/DeKal/bookstore_users-api/src/logger"
 	mysqlutils "github.com/DeKal/bookstore_users-api/src/utils/mysql_utils"
 	"github.com/DeKal/bookstore_utils-go/errors"
@@ -19,24 +19,31 @@ const (
 	queryFindByEmailPwd   = "SELECT id, first_name, last_name, email, date_created, status FROM users WHERE email=? AND password=? AND status=?;"
 )
 
-var (
-	// UserDAO contains logic working directly with DB
-	UserDAO userDAOInterface = &userDAO{}
-)
+// UserDAO manage direct interaction with DB
+type UserDAO struct {
+	client *sql.DB
+}
 
-type userDAO struct{}
-type userDAOInterface interface {
-	Save(*userdto.User) *errors.RestError
-	Get(*userdto.User) *errors.RestError
-	Update(*userdto.User) *errors.RestError
+// UserDAOInterface interface manage direct interaction with DB
+type UserDAOInterface interface {
+	Save(*dto.User) *errors.RestError
+	Get(*dto.User) *errors.RestError
+	Update(*dto.User) *errors.RestError
 	Delete(int64) *errors.RestError
-	FindByStatus(string) (userdto.Users, *errors.RestError)
-	FindByEmailAndPassword(*userdto.User) *errors.RestError
+	FindByStatus(string) (dto.Users, *errors.RestError)
+	FindByEmailAndPassword(*dto.User) *errors.RestError
+}
+
+// NewUserDao return new userDao
+func NewUserDao(client *sql.DB) UserDAOInterface {
+	return &UserDAO{
+		client: client,
+	}
 }
 
 // Save to persist User to DB
-func (*userDAO) Save(user *userdto.User) *errors.RestError {
-	stmt, err := usersdb.Client.Prepare(queryInsertUser)
+func (dao *UserDAO) Save(user *dto.User) *errors.RestError {
+	stmt, err := dao.client.Prepare(queryInsertUser)
 	if err != nil {
 		return errors.NewInternalServerError(err.Error())
 	}
@@ -58,8 +65,8 @@ func (*userDAO) Save(user *userdto.User) *errors.RestError {
 }
 
 // Get to get User from DB
-func (*userDAO) Get(user *userdto.User) *errors.RestError {
-	stmt, err := usersdb.Client.Prepare(queryGetUser)
+func (dao *UserDAO) Get(user *dto.User) *errors.RestError {
+	stmt, err := dao.client.Prepare(queryGetUser)
 	if err != nil {
 		logger.Error("Error while prepare SQL statement for get user", err)
 		return errors.NewInternalServerError("Database error")
@@ -78,8 +85,8 @@ func (*userDAO) Get(user *userdto.User) *errors.RestError {
 }
 
 // Update to update existed User from DB
-func (*userDAO) Update(user *userdto.User) *errors.RestError {
-	stmt, err := usersdb.Client.Prepare(queryUpdate)
+func (dao *UserDAO) Update(user *dto.User) *errors.RestError {
+	stmt, err := dao.client.Prepare(queryUpdate)
 	if err != nil {
 		logger.Error("Error while prepare SQL statement for update user", err)
 		return errors.NewInternalServerError("Database error")
@@ -96,8 +103,8 @@ func (*userDAO) Update(user *userdto.User) *errors.RestError {
 }
 
 // Delete to delete existed User from DB
-func (*userDAO) Delete(userID int64) *errors.RestError {
-	stmt, err := usersdb.Client.Prepare(queryDelete)
+func (dao *UserDAO) Delete(userID int64) *errors.RestError {
+	stmt, err := dao.client.Prepare(queryDelete)
 	if err != nil {
 		logger.Error("Error while prepare SQL statement for delete user", err)
 		return errors.NewInternalServerError("Database error")
@@ -113,8 +120,8 @@ func (*userDAO) Delete(userID int64) *errors.RestError {
 }
 
 // FindByStatus find Users by status
-func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
-	stmt, err := usersdb.Client.Prepare(queryFindUserByStatus)
+func (dao *UserDAO) FindByStatus(status string) (dto.Users, *errors.RestError) {
+	stmt, err := dao.client.Prepare(queryFindUserByStatus)
 	if err != nil {
 		logger.Error("Error while prepare SQL statement for find user by status", err)
 		return nil, errors.NewInternalServerError("Database error")
@@ -128,9 +135,9 @@ func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
 	}
 	defer rows.Close()
 
-	users := make(userdto.Users, 0)
+	users := make(dto.Users, 0)
 	for rows.Next() {
-		user := userdto.User{}
+		user := dto.User{}
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status)
 		if err != nil {
@@ -148,15 +155,15 @@ func (*userDAO) FindByStatus(status string) (userdto.Users, *errors.RestError) {
 }
 
 // FindByEmailAndPassword to get User from DB
-func (*userDAO) FindByEmailAndPassword(user *userdto.User) *errors.RestError {
-	stmt, err := usersdb.Client.Prepare(queryFindByEmailPwd)
+func (dao *UserDAO) FindByEmailAndPassword(user *dto.User) *errors.RestError {
+	stmt, err := dao.client.Prepare(queryFindByEmailPwd)
 	if err != nil {
 		logger.Error("Error while prepare SQL statement for get user by email and password", err)
 		return errors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
-	result := stmt.QueryRow(user.Email, user.Password, userdto.StatusActive)
+	result := stmt.QueryRow(user.Email, user.Password, dto.StatusActive)
 	err = result.Scan(
 		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status)
 
