@@ -21,6 +21,12 @@ const (
 	errNoRow                     = "no rows in result set"
 )
 
+// HandleCommonError handle error with messages only
+func HandleCommonError(logMsg string, err error) *errors.RestError {
+	logger.Error(logMsg, err)
+	return errors.NewInternalServerError("Database Error!!!")
+}
+
 // HandleSaveUserError handle error when saving a user
 func HandleSaveUserError(user *dto.User, err error) *errors.RestError {
 	saveError, convertErr := err.(*mysql.MySQLError)
@@ -35,7 +41,7 @@ func HandleSaveUserError(user *dto.User, err error) *errors.RestError {
 
 func returnInternalServerWhenSavingUser(err error) *errors.RestError {
 	errMsg := fmt.Sprintf(errorSaveUser, err.Error())
-	logger.Error(errMsg, nil)
+	logger.Error(errMsg, err)
 	return errors.NewInternalServerError(errMsg)
 }
 
@@ -51,16 +57,22 @@ func HandleGetUserError(user *dto.User, err error) *errors.RestError {
 	if strings.Contains(errMsg, errNoRow) {
 		errMsg = fmt.Sprintf(errorUserNotExisted, user.ID)
 	}
-	logger.Error(errMsg, nil)
+	logger.Error(errMsg, err)
 	return errors.NewInternalServerError(errMsg)
 }
 
 // HandleLoginUserError handle error when login a user
 func HandleLoginUserError(user *dto.User, err error) *errors.RestError {
+	logger.Error("Error for get user by email and password", err)
 	errMsg := fmt.Sprintf(errorLoginUser, user.ID, err.Error())
 	if strings.Contains(errMsg, errNoRow) {
 		errMsg = fmt.Sprintf(errorUserNotHavingCredential, user.ID)
 	}
-	logger.Error(errMsg, nil)
+	logger.Error(errMsg, err)
 	return errors.NewInternalServerError(errMsg)
+}
+
+//HandleFindByStatusError handle error for find user by status
+func HandleFindByStatusError(status string, err error) *errors.RestError {
+	return errors.NewInternalServerError(fmt.Sprintf("No user found with status %s", status))
 }

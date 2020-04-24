@@ -2,10 +2,8 @@ package dao
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/DeKal/bookstore_users-api/src/domain/users/dto"
-	"github.com/DeKal/bookstore_users-api/src/logger"
 	mysqlutils "github.com/DeKal/bookstore_users-api/src/utils/mysql_utils"
 	"github.com/DeKal/bookstore_utils-go/errors"
 )
@@ -45,14 +43,14 @@ func NewUserDao(client *sql.DB) UserDAOInterface {
 func (dao *UserDAO) Save(user *dto.User) *errors.RestError {
 	stmt, err := dao.client.Prepare(queryInsertUser)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		return mysqlutils.HandleSaveUserError(user, err)
 	}
 	defer stmt.Close()
 
 	insertUser, err := stmt.Exec(
 		user.FirstName, user.LastName, user.Email, user.DateCreated, user.Status, user.Password)
 	if err != nil {
-		return errors.NewInternalServerError(err.Error())
+		return mysqlutils.HandleSaveUserError(user, err)
 	}
 
 	userID, err := insertUser.LastInsertId()
@@ -68,8 +66,7 @@ func (dao *UserDAO) Save(user *dto.User) *errors.RestError {
 func (dao *UserDAO) Get(user *dto.User) *errors.RestError {
 	stmt, err := dao.client.Prepare(queryGetUser)
 	if err != nil {
-		logger.Error("Error while prepare SQL statement for get user", err)
-		return errors.NewInternalServerError("Database error")
+		return mysqlutils.HandleCommonError("Error while prepare SQL statement for get user", err)
 	}
 	defer stmt.Close()
 
@@ -88,15 +85,13 @@ func (dao *UserDAO) Get(user *dto.User) *errors.RestError {
 func (dao *UserDAO) Update(user *dto.User) *errors.RestError {
 	stmt, err := dao.client.Prepare(queryUpdate)
 	if err != nil {
-		logger.Error("Error while prepare SQL statement for update user", err)
-		return errors.NewInternalServerError("Database error")
+		return mysqlutils.HandleCommonError("Error while prepare SQL statement for update user", err)
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
 	if err != nil {
-		logger.Error("Error while execute SQL update statement", err)
-		return errors.NewInternalServerError("Database error")
+		return mysqlutils.HandleCommonError("Error while execute SQL update statement", err)
 	}
 
 	return nil
@@ -106,14 +101,12 @@ func (dao *UserDAO) Update(user *dto.User) *errors.RestError {
 func (dao *UserDAO) Delete(userID int64) *errors.RestError {
 	stmt, err := dao.client.Prepare(queryDelete)
 	if err != nil {
-		logger.Error("Error while prepare SQL statement for delete user", err)
-		return errors.NewInternalServerError("Database error")
+		return mysqlutils.HandleCommonError("Error while prepare SQL statement for delete user", err)
 	}
 	defer stmt.Close()
 
 	if _, err = stmt.Exec(userID); err != nil {
-		logger.Error("Error while execute SQL delete statement", err)
-		return errors.NewInternalServerError("Database error")
+		return mysqlutils.HandleCommonError("Error while execute SQL delete statement", err)
 	}
 
 	return nil
@@ -123,15 +116,15 @@ func (dao *UserDAO) Delete(userID int64) *errors.RestError {
 func (dao *UserDAO) FindByStatus(status string) (dto.Users, *errors.RestError) {
 	stmt, err := dao.client.Prepare(queryFindUserByStatus)
 	if err != nil {
-		logger.Error("Error while prepare SQL statement for find user by status", err)
-		return nil, errors.NewInternalServerError("Database error")
+		return nil,
+			mysqlutils.HandleCommonError("Error while prepare SQL statement for find user by status", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(status)
 	if err != nil {
-		logger.Error("Error while execute SQL queryFindUserByStatus statement", err)
-		return nil, errors.NewInternalServerError("Database error")
+		return nil,
+			mysqlutils.HandleCommonError("Error while execute SQL queryFindUserByStatus statement", err)
 	}
 	defer rows.Close()
 
@@ -141,14 +134,14 @@ func (dao *UserDAO) FindByStatus(status string) (dto.Users, *errors.RestError) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status)
 		if err != nil {
-			logger.Error("Error while execute SQL queryFindUserByStatus statement", err)
-			return nil, errors.NewInternalServerError("Database error")
+			return nil,
+				mysqlutils.HandleCommonError("Error while execute SQL queryFindUserByStatus statement", err)
 		}
 		users = append(users, user)
 	}
 
 	if len(users) == 0 {
-		return nil, errors.NewInternalServerError(fmt.Sprintf("No user found with status %s", status))
+		return nil, mysqlutils.HandleFindByStatusError(status, err)
 	}
 
 	return users, nil
@@ -158,8 +151,7 @@ func (dao *UserDAO) FindByStatus(status string) (dto.Users, *errors.RestError) {
 func (dao *UserDAO) FindByEmailAndPassword(user *dto.User) *errors.RestError {
 	stmt, err := dao.client.Prepare(queryFindByEmailPwd)
 	if err != nil {
-		logger.Error("Error while prepare SQL statement for get user by email and password", err)
-		return errors.NewInternalServerError("Database error")
+		return mysqlutils.HandleCommonError("Error while prepare SQL statement for get user by email and password", err)
 	}
 	defer stmt.Close()
 
@@ -168,7 +160,6 @@ func (dao *UserDAO) FindByEmailAndPassword(user *dto.User) *errors.RestError {
 		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status)
 
 	if err != nil {
-		logger.Error("Error for get user by email and password", err)
 		return mysqlutils.HandleLoginUserError(user, err)
 	}
 
