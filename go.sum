@@ -6,6 +6,10 @@ github.com/DeKal/bookstore_oauth-go v0.0.0-20200419160345-78a06b1eeb6c h1:6haowW
 github.com/DeKal/bookstore_oauth-go v0.0.0-20200419160345-78a06b1eeb6c/go.mod h1:ZkDBKr0H4PUcupa2ZtIZmT98uDx9oBczfGB+VZZGkeo=
 github.com/DeKal/bookstore_oauth-go v1.0.0 h1:Cnm6/vqVaCQnWR9t5F+67p2i/MHFVled9fn2MX7IU3E=
 github.com/DeKal/bookstore_oauth-go v1.0.0/go.mod h1:ZkDBKr0H4PUcupa2ZtIZmT98uDx9oBczfGB+VZZGkeo=
+github.com/DeKal/bookstore_oauth-go v1.0.1 h1:UL8g6Z7JfnxFnFdSz9NiAuyJW20sPJaeEmD1oJbr81w=
+github.com/DeKal/bookstore_oauth-go v1.0.1/go.mod h1:5BUCvc8aTL36EByCs/zI/A6eTciCzhEpefe4QKY7X3g=
+github.com/DeKal/bookstore_oauth-go v1.0.2 h1:sSV6K+4pyYwYGCvejsEqPzdiYjmPlsfmlUFkJbw5hD0=
+github.com/DeKal/bookstore_oauth-go v1.0.2/go.mod h1:5BUCvc8aTL36EByCs/zI/A6eTciCzhEpefe4QKY7X3g=
 github.com/DeKal/bookstore_utils-go v0.0.0-20200419142414-99adc7088cc5 h1:iZZ6KNa1LtsZcQB+cPCMBixBPJKMMPZY7Nfy+PMMMac=
 github.com/DeKal/bookstore_utils-go v0.0.0-20200419142414-99adc7088cc5/go.mod h1:qi/d2BQ2slbT1pak1vmWO1ZClCYGKDM0Vu+w7lvqxpk=
 github.com/DeKal/bookstore_utils-go v1.0.0 h1:JQDS0vo9DVpUI4lmFefn4UkFkNT8r0cexes25a5Eeow=
