@@ -4,9 +4,8 @@ import (
 	"github.com/DeKal/bookstore_users-api/src/controllers/users"
 	usersdb "github.com/DeKal/bookstore_users-api/src/datasources/mysql/users_db"
 	"github.com/DeKal/bookstore_users-api/src/domain/users/dao"
-
-	"github.com/DeKal/bookstore_users-api/src/logger"
 	"github.com/DeKal/bookstore_users-api/src/services"
+	"github.com/DeKal/bookstore_utils-go/logger"
 	"github.com/gin-gonic/gin"
 )
 
